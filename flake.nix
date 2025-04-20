@@ -23,7 +23,7 @@
           stdenv = pkgs.llvmPackages_19.stdenv;
         } {
           packages = with pkgs;
-            [ cmake klee z3 ]
+            [ cmake klee z3 lit ]
             ++ (with pkgs.llvmPackages_19; [ llvm clang lld ]);
 
           # Set LLVM_DIR to point to the LLVM installation

@@ -1,55 +1,12 @@
 cmake_minimum_required(VERSION 3.20)
 project(llvm-tutor)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 #===============================================================================
-# 1. VERIFY LLVM INSTALLATION DIR
+# 1. VERIFY LLVM INSTALLATION
 # This is just a bit of a sanity checking.
 #===============================================================================
-set(LT_LLVM_INSTALL_DIR "" CACHE PATH "LLVM installation directory")
-
-# 1.1 Check the "include" directory
-set(LT_LLVM_INCLUDE_DIR "${LT_LLVM_INSTALL_DIR}/include/llvm")
-if(NOT EXISTS "${LT_LLVM_INCLUDE_DIR}")
-message(FATAL_ERROR
-  " LT_LLVM_INSTALL_DIR (${LT_LLVM_INCLUDE_DIR}) is invalid.")
-endif()
-
-# 1.2 Check that the LLVMConfig.cmake file exists (the location depends on the
-# OS)
-set(LT_VALID_INSTALLATION FALSE)
-
-# Ubuntu + Darwin
-if(EXISTS "${LT_LLVM_INSTALL_DIR}/lib/cmake/llvm/LLVMConfig.cmake")
-  set(LT_VALID_INSTALLATION TRUE)
-endif()
-
-# Fedora
-if(EXISTS "${LT_LLVM_INSTALL_DIR}/lib64/cmake/llvm/LLVMConfig.cmake")
-  set(LT_VALID_INSTALLATION TRUE)
-endif()
-
-if(NOT ${LT_VALID_INSTALLATION})
-  message(FATAL_ERROR
-    "LLVM installation directory, (${LT_LLVM_INSTALL_DIR}), is invalid. Couldn't
-    find LLVMConfig.cmake.")
-endif()
-
-#===============================================================================
-# 2. LOAD LLVM CONFIGURATION
-#    For more: http://llvm.org/docs/CMake.html#embedding-llvm-in-your-project
-#===============================================================================
-# Add the location of LLVMConfig.cmake to CMake search paths (so that
-# find_package can locate it)
-# Note: On Fedora, when using the pre-compiled binaries installed with `dnf`,
-# LLVMConfig.cmake is located in "/usr/lib64/cmake/llvm". But this path is
-# among other paths that will be checked by default when using
-# `find_package(llvm)`. So there's no need to add it here.
-list(APPEND CMAKE_PREFIX_PATH "${LT_LLVM_INSTALL_DIR}/lib/cmake/llvm/")
-
-# The way LLVMConfigVersion.cmake is set up, it will only match MAJOR.MINOR
-# exactly, even if we do not specify "REQUIRED" in the statement below.
-# So we accept any version and do the proper ranged check below.
-find_package(LLVM CONFIG)
+find_package(LLVM CONFIG REQUIRED)
 
 # We defer the version checking to this statement
 if("${LLVM_VERSION_MAJOR}" VERSION_LESS 19)
