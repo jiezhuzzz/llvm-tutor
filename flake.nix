@@ -3,28 +3,42 @@
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
 
-  outputs = { self, nixpkgs, }:
-    let
-      supportedSystems = [ "x86_64-linux" "aarch64-darwin" ];
-      forEachSupportedSystem = f:
-        nixpkgs.lib.genAttrs supportedSystems (system:
-          f {
-            pkgs = import nixpkgs {
-              inherit system;
-              config = {
-                allowUnfree = true; # Allow unfree packages
-              };
+  outputs = {
+    self,
+    nixpkgs,
+  }: let
+    supportedSystems = ["x86_64-linux" "aarch64-darwin"];
+    forEachSupportedSystem = f:
+      nixpkgs.lib.genAttrs supportedSystems (system:
+        f {
+          pkgs = import nixpkgs {
+            inherit system;
+            config = {
+              allowUnfree = true; # Allow unfree packages
             };
-          });
-    in {
-      devShells = forEachSupportedSystem ({ pkgs }: {
-        default = pkgs.mkShell.override {
+          };
+        });
+  in {
+    devShells = forEachSupportedSystem ({pkgs}: {
+      default =
+        pkgs.mkShell.override {
           # Override stdenv in order to change compiler:
           stdenv = pkgs.llvmPackages_19.stdenv;
         } {
           packages = with pkgs;
-            [ cmake klee z3 lit ]
-            ++ (with pkgs.llvmPackages_19; [ llvm clang lld ]);
+            [
+              cmake
+              klee
+              z3
+              lit
+              libxml2
+              libffi
+            ]
+            ++ (with pkgs.llvmPackages_19; [
+              llvm
+              clang
+              lld
+            ]);
 
           # Set LLVM_DIR to point to the LLVM installation
           shellHook = ''
@@ -34,6 +48,6 @@
             #export LLVMCXX=${pkgs.llvmPackages_19.llvm}/bin/clang++
           '';
         };
-      });
-    };
+    });
+  };
 }
