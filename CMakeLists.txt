@@ -14,14 +14,6 @@ if("${LLVM_VERSION_MAJOR}" VERSION_LESS 19)
 endif()
 
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
-message(STATUS "Using LLVMConfig.cmake in: ${LT_LLVM_INSTALL_DIR}")
-
-message("LLVM STATUS:
-  Definitions ${LLVM_DEFINITIONS}
-  Includes    ${LLVM_INCLUDE_DIRS}
-  Libraries   ${LLVM_LIBRARY_DIRS}
-  Targets     ${LLVM_TARGETS_TO_BUILD}"
-)
 
 # Set the LLVM header and library paths
 include_directories(SYSTEM ${LLVM_INCLUDE_DIRS})
